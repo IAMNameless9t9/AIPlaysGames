@@ -3,6 +3,18 @@ import pygame
 import sys
 import random
 
+from AgentBrain import *
+
+HAS_SNAKE_AI = False
+
+def SETUP_SNAKE_AI(Setting):
+
+    global HAS_SNAKE_AI
+    if Setting == True:
+        HAS_SNAKE_AI = True
+    else:
+        HAS_SNAKE_AI = False
+
 #Creation Of The Snake Class
 class SNAKE(object):
 
@@ -44,6 +56,18 @@ class SNAKE(object):
             r = pygame.Rect((p[0], p[1]), (GRIDSIZE, GRIDSIZE))
             pygame.draw.rect(surface, self.color, r)
             pygame.draw.rect(surface, (93, 216, 228), r, 1)
+            
+    def SNAKE_RIGHT(self):
+        self.turn(RIGHT)
+        
+    def SNAKE_LEFT(self):
+        self.turn(LEFT)
+        
+    def SNAKE_UP(self):
+        self.turn(UP)
+        
+    def SNAKE_DOWN(self):
+        self.turn(DOWN)
                              
 
     def handleKeys(self):
@@ -51,15 +75,17 @@ class SNAKE(object):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    self.turn(UP)
-                elif event.key == pygame.K_DOWN:
-                    self.turn(DOWN)
-                elif event.key == pygame.K_LEFT:
-                    self.turn(LEFT)
-                elif event.key == pygame.K_RIGHT:
-                    self.turn(RIGHT)
+            if HAS_SNAKE_AI == False:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        self.turn(UP)
+                    elif event.key == pygame.K_DOWN:
+                        self.turn(DOWN)
+                    elif event.key == pygame.K_LEFT:
+                        self.turn(LEFT)
+                    elif event.key == pygame.K_RIGHT:
+                        self.turn(RIGHT)
+        
                     
 #Creation Of The Food Class
 class FOOD(object):
@@ -103,7 +129,7 @@ DOWN = (0, 1)
 LEFT = (-1, 0)
 RIGHT = (1, 0)
 
-def main():
+def Snake_Main():
 
 
     pygame.init()
@@ -129,20 +155,12 @@ def main():
         
         DrawGrid(surface)
         snake.move()
+        
+        print(snake.direction)
 
-        sx, sy = snake.getHeadPosition()
-        fx, fy = food.position
 
-
-        #Basic Bot
-        if sx > fx: #Go Left
-            snake.turn(LEFT)
-        elif sx < fx: #Go Right
-            snake.turn(RIGHT)
-        elif sy < fy: #Go Down
-            snake.turn(DOWN)
-        elif sy > fy: #Go Up
-            snake.turn(UP)
+        if HAS_SNAKE_AI == True:
+            GainGameInfo(snake, food)
 
         #resets score when snake dies
         if snake.dead == 1:
@@ -171,6 +189,6 @@ def main():
         pygame.display.update()
 
 
-main()
+##Snake_Main()
 
         
