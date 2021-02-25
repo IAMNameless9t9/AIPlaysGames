@@ -3,7 +3,7 @@ import pygame
 import sys
 import random
 
-from AgentBrain import *
+from AgentBrain import GainGameInfoFrom_Snake
 
 HAS_SNAKE_AI = False
 
@@ -156,11 +156,11 @@ def Snake_Main():
         DrawGrid(surface)
         snake.move()
         
-        print(snake.direction)
+        #print(snake.direction)
 
 
         if HAS_SNAKE_AI == True:
-            GainGameInfo(snake, food)
+            GainGameInfoFrom_Snake(snake, food)
 
         #resets score when snake dies
         if snake.dead == 1:

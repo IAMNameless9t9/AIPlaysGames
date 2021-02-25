@@ -1,8 +1,10 @@
 
 
 #Imports Functions From All 3 Games
-from SNAKE import *
-#from BreakoutGamev01 import *
+from SNAKE import SETUP_SNAKE_AI
+from SNAKE import Snake_Main
+from BreakoutGamev02 import SETUP_BREAKOUT_AI
+from BreakoutGamev02 import Breakout_Main
 #from Pac-Man import *
 
 #Ask User Which Game To Play
@@ -14,7 +16,8 @@ if answer == 1: #Play Breakout
     print("Breakout Loading...")
     if answerAI == 0:
         print("Loading AI...")
-    #Call Breakout's Main
+        SETUP_BREAKOUT_AI(True)
+    Breakout_Main()
     
     
 if answer == 2: #Play Pac-Man

@@ -2,11 +2,21 @@ import sys
 import pygame
 import time
 
+from AgentBrain import *
+
 SCREEN_HEIGHT = 560
 SCREEN_WIDTH = 820
 GAME_RUNNING = True
 SCORE = 0
-SIMPLE_REFLEX_AGENT = True
+SIMPLE_REFLEX_AGENT = False
+
+def SETUP_BREAKOUT_AI(Setting):
+
+    global SIMPLE_REFLEX_AGENT
+    if Setting == True:
+        SIMPLE_REFLEX_AGENT = True
+    else:
+        SIMPLE_REFLEX_AGENT = False
 
 class PADDLE(object):
 
@@ -31,16 +41,7 @@ class PADDLE(object):
         (x, y) , (dx, dy) = self.hitbox
         (bx, by), (bdx, bdy) = ball.hitbox
 
-        if SIMPLE_REFLEX_AGENT == True:
-            if x > border.xMin and (x + 50) > bx:
-                self.curSpeed = -self.baseSpeed
-                self.body.move_ip(self.curSpeed, 0)
-                self.hitbox = ((x + self.curSpeed, y),(dx + self.curSpeed, dy))
-            elif dx < border.xMax and (dx - 50) < bdx:
-                self.curSpeed = self.baseSpeed
-                self.body.move_ip(self.curSpeed, 0)
-                self.hitbox = ((x + self.curSpeed, y),(dx + self.curSpeed, dy))
-        else:
+        if SIMPLE_REFLEX_AGENT == False:
             if x > border.xMin and self.leftDown:
                 self.body.move_ip(self.curSpeed, 0)
                 self.hitbox = ((x + self.curSpeed, y),(dx + self.curSpeed, dy))
@@ -242,7 +243,7 @@ class BALL(object):
 #   Level Design Randomization?
 #
 #=========================================================================#
-def main():
+def Breakout_Main():
 
     pygame.init()
     clock = pygame.time.Clock()
@@ -259,6 +260,9 @@ def main():
     NumberofBricks = bricksX * bricksY
     bricks = [BRICK(border.thickness, border.thickness + bricksGap)] * NumberofBricks
     ballSpeed = 1
+    
+    #Goes To AI Brain
+    GainGameInfoFrom_Breakout(paddle.hitbox, ball.hitbox)
 
     i = border.thickness
     k = 0
@@ -316,4 +320,4 @@ def main():
     pygame.quit()
     sys.exit()
 
-main()
+##Breakout_Main()
