@@ -3,10 +3,8 @@ import pygame
 import sys
 import random
 
-from AgentBrain import GainGameInfoFrom_Snake
-
 HAS_SNAKE_AI = False
-
+#================================
 def SETUP_SNAKE_AI(Setting):
 
     global HAS_SNAKE_AI
@@ -14,7 +12,7 @@ def SETUP_SNAKE_AI(Setting):
         HAS_SNAKE_AI = True
     else:
         HAS_SNAKE_AI = False
-
+#================================
 #Creation Of The Snake Class
 class SNAKE(object):
 
@@ -74,7 +72,6 @@ class SNAKE(object):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                sys.exit()
             if HAS_SNAKE_AI == False:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
@@ -129,6 +126,14 @@ DOWN = (0, 1)
 LEFT = (-1, 0)
 RIGHT = (1, 0)
 
+CurrentSnakeAndFood = ()
+
+def SetSnakeAndFood(snake, food):
+    CurrentSnakeAndFood = (snake, food)
+
+def GetCurrentSnakeAndFood():
+    return CurrentSnakeAndFood
+
 def Snake_Main():
 
 
@@ -160,7 +165,20 @@ def Snake_Main():
 
 
         if HAS_SNAKE_AI == True:
-            GainGameInfoFrom_Snake(snake, food)
+        
+            SnakeHead_X, SnakeHead_Y = snake.getHeadPosition()
+    
+            #Get Food Position
+            Food_X, Food_Y = food.position
+                
+            if SnakeHead_X > Food_X: #Go Left
+                snake.SNAKE_LEFT()
+            elif SnakeHead_X < Food_X: #Go Right
+                snake.SNAKE_RIGHT()
+            elif SnakeHead_Y < Food_Y: #Go Down
+                snake.SNAKE_DOWN()
+            elif SnakeHead_Y > Food_Y: #Go Up
+                snake.SNAKE_UP()
 
         #resets score when snake dies
         if snake.dead == 1:

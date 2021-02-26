@@ -2,8 +2,6 @@ import sys
 import pygame
 import time
 
-from AgentBrain import *
-
 SCREEN_HEIGHT = 560
 SCREEN_WIDTH = 820
 GAME_RUNNING = True
@@ -48,12 +46,21 @@ class PADDLE(object):
             elif dx < border.xMax and self.rightDown:
                 self.body.move_ip(self.curSpeed, 0)
                 self.hitbox = ((x + self.curSpeed, y),(dx + self.curSpeed, dy))
+        if SIMPLE_REFLEX_AGENT == True:  
+            if x > border.xMin and (x + 50) > bx:
+                self.curSpeed = -self.baseSpeed
+                self.body.move_ip(self.curSpeed, 0)
+                self.hitbox = ((x + self.curSpeed, y),(dx + self.curSpeed, dy))
+                
+            elif dx < border.xMax and (dx - 50) < bdx:
+                self.curSpeed = self.baseSpeed
+                self.body.move_ip(self.curSpeed, 0)
+                self.hitbox = ((x + self.curSpeed, y),(dx + self.curSpeed, dy))
 
     def handleKeys(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     self.curSpeed = -self.baseSpeed
@@ -260,9 +267,6 @@ def Breakout_Main():
     NumberofBricks = bricksX * bricksY
     bricks = [BRICK(border.thickness, border.thickness + bricksGap)] * NumberofBricks
     ballSpeed = 1
-    
-    #Goes To AI Brain
-    GainGameInfoFrom_Breakout(paddle.hitbox, ball.hitbox)
 
     i = border.thickness
     k = 0
@@ -318,6 +322,6 @@ def Breakout_Main():
 
     time.sleep(5)
     pygame.quit()
-    sys.exit()
+    #sys.exit()
 
 ##Breakout_Main()
