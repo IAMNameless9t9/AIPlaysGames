@@ -27,21 +27,21 @@ class Button:
         self.textData = text
         
         self.Body = turtle.Turtle()
-        self.Body.color(RGB)
-        self.Body.shape("square")
         self.Body.penup()
         self.Body.goto(location)
+        self.Body.color(RGB)
+        self.Body.shape("square")
         
         self.Text = turtle.Turtle()
+        self.Text.penup()
+        self.Text.goto(self.Body.xcor() + 20, self.Body.ycor() - 8)
         #=============================
         if ENABLE_DARK_MODE == False:
             self.Text.color("black")
         else:
             self.Text.color("white")
         #=============================
-        self.Text.penup()
         self.Text.hideturtle()
-        self.Text.goto(self.Body.xcor() + 20, self.Body.ycor() - 8)
         self.Text.write(self.textData, align="left", font=("Verdana", 10, "bold"))
         
         
@@ -56,11 +56,11 @@ class Cursor:
         self.MaxDown = maxdown
     
         self.Body = turtle.Turtle()
+        self.Body.penup()
+        self.Body.goto(location)
         self.Body.color("grey")
         self.Body.shape("triangle")
         self.Body.shapesize(.5, .5, None)
-        self.Body.penup()
-        self.Body.goto(location)
         
     def GoUp(self):
         if not self.Body.ycor() == self.MaxUp:
@@ -78,33 +78,35 @@ class Cursor:
         
     def UndoSelection(self):
         self.Selection = False
-        
-
-def MAIN():
-
-    XPos = -300
-    YPos = 250
-    Dist = 50
-
-    Snake_Button = Button("green", "Start Snake", (XPos,YPos))
-    Breakout_Button = Button("blue", "Start Breakout", (XPos,YPos - Dist))
-    PacMan_Button = Button("gold", "Start PacMan", (XPos,YPos - Dist * 2))
-    QuitButton = Button("red", "Quit Program", (XPos,YPos - Dist * 3))
     
+XPos = -300
+YPos = 250
+Dist = 50
+
+ButtonColor = "white"
+#=============================
+if ENABLE_DARK_MODE == False:
+    ButtonColor = "black"
+else:
     ButtonColor = "white"
-    #=============================
-    if ENABLE_DARK_MODE == False:
-        ButtonColor = "black"
-    else:
-        ButtonColor = "white"
-    #=============================
+#=============================
     
-    AI_Button = Button(ButtonColor, "Start As AI", (XPos,YPos - Dist * 5))
-    User_Button = Button(ButtonColor, "Start As User", (XPos,YPos - Dist * 6))
-    
-    Game_Cursor = Cursor((-325,250), Dist, YPos, YPos-Dist*3)
-    AI_Cursor = Cursor((-325, YPos-Dist*5), Dist, (YPos-Dist*5), (YPos-Dist*6))
-    
+Snake_Button = Button("green", "Start Snake", (XPos,YPos))
+Breakout_Button = Button("blue", "Start Breakout", (XPos,YPos - Dist))
+PacMan_Button = Button("gold", "Start PacMan", (XPos,YPos - Dist * 2))
+QuitButton = Button("red", "Quit Program", (XPos,YPos - Dist * 3))
+
+AI_Button = Button(ButtonColor, "Start As AI", (XPos,YPos - Dist * 5))
+User_Button = Button(ButtonColor, "Start As User", (XPos,YPos - Dist * 6))
+
+Instructions_Button_Games = Button(ButtonColor, "Use Up And Down Arrows To Choose Game", (XPos,YPos - Dist * 8))
+Instructions_Button_AIToggle = Button(ButtonColor, "Press 1 For AI, Press 0 For User", (XPos,YPos - Dist * 9))
+Instructions_Button_Selection = Button(ButtonColor, "Press Enter To Execute Game", (XPos,YPos - Dist * 10))
+
+Game_Cursor = Cursor((-325,250), Dist, YPos, YPos-Dist*3)
+AI_Cursor = Cursor((-325, YPos-Dist*5), Dist, (YPos-Dist*5), (YPos-Dist*6))
+
+def MAIN(): 
     
     turtle.listen()
     turtle.onkey(Game_Cursor.GoUp, "Up")

@@ -4,6 +4,8 @@ import sys
 import random
 
 HAS_SNAKE_AI = False
+SCORE = 0
+HIGHSCORE = 0
 #================================
 def SETUP_SNAKE_AI(Setting):
 
@@ -150,8 +152,6 @@ def Snake_Main():
 
     myfont = pygame.font.SysFont("monospace", 16)
 
-    score = 0
-    highscore = 0
     while(True):
         
         clock.tick(10)
@@ -183,25 +183,26 @@ def Snake_Main():
         #resets score when snake dies
         if snake.dead == 1:
             snake.dead = 0
-            if score >= highscore:
-                highscore = score
-            score = 0
+            global SCORE
+            global HIGHSCORE
+            if SCORE >= HIGHSCORE:
+                HIGHSCORE = SCORE
+            SCORE = 0
         
 
         if snake.getHeadPosition() == food.position:
             snake.length += 1
-            score += 1
+            SCORE += 1
             food.randomizePosition()
             
         snake.draw(surface)
         food.draw(surface)
         
         screen.blit(surface, (0,0))
-        text = myfont.render("Score {0}".format(score), 1, (0, 0, 0))
+        text = myfont.render("Score {0}".format(SCORE), 1, (0, 0, 0))
         screen.blit(text, (5, 10))
 
-
-        hstext = myfont.render("High Score {0}".format(highscore), 1, (0, 0, 0))
+        hstext = myfont.render("High Score {0}".format(HIGHSCORE), 1, (0, 0, 0))
         screen.blit(hstext, (SCREEN_WIDTH-145, 10))
         
         pygame.display.update()
