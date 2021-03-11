@@ -7,7 +7,15 @@ SCREEN_WIDTH = 820
 GAME_RUNNING = True
 SCORE = 0
 
-SIMPLE_REFLEX_AGENT = True
+SIMPLE_REFLEX_AGENT = False
+
+def SETUP_BREAKOUT_AI(Setting):
+
+    global SIMPLE_REFLEX_AGENT
+    if Setting == True:
+        SIMPLE_REFLEX_AGENT = True
+    else:
+        SIMPLE_REFLEX_AGENT = False
 
 class PADDLE(object):
 
@@ -53,7 +61,7 @@ class PADDLE(object):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                sys.exit()
+                ##sys.exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     self.curSpeed = -self.baseSpeed
@@ -243,7 +251,7 @@ class BALL(object):
 #   Level Design Randomization?
 #
 #=========================================================================#
-def main():
+def Breakout_Main():
 
     pygame.init()
     clock = pygame.time.Clock()
@@ -315,6 +323,6 @@ def main():
 
     time.sleep(5)
     pygame.quit()
-    sys.exit()
+    ##sys.exit()
 
-main()
+##Breakout_Main()

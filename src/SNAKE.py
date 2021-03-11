@@ -3,6 +3,18 @@ import pygame
 import sys
 import random
 
+HAS_SNAKE_AI = False
+SCORE = 0
+HIGHSCORE = 0
+#================================
+def SETUP_SNAKE_AI(Setting):
+
+    global HAS_SNAKE_AI
+    if Setting == True:
+        HAS_SNAKE_AI = True
+    else:
+        HAS_SNAKE_AI = False
+#================================
 #Creation Of The Snake Class
 class SNAKE(object):
 
@@ -44,22 +56,35 @@ class SNAKE(object):
             r = pygame.Rect((p[0], p[1]), (GRIDSIZE, GRIDSIZE))
             pygame.draw.rect(surface, self.color, r)
             pygame.draw.rect(surface, (93, 216, 228), r, 1)
+            
+    def SNAKE_RIGHT(self):
+        self.turn(RIGHT)
+        
+    def SNAKE_LEFT(self):
+        self.turn(LEFT)
+        
+    def SNAKE_UP(self):
+        self.turn(UP)
+        
+    def SNAKE_DOWN(self):
+        self.turn(DOWN)
                              
 
     def handleKeys(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    self.turn(UP)
-                elif event.key == pygame.K_DOWN:
-                    self.turn(DOWN)
-                elif event.key == pygame.K_LEFT:
-                    self.turn(LEFT)
-                elif event.key == pygame.K_RIGHT:
-                    self.turn(RIGHT)
+            if HAS_SNAKE_AI == False:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        self.turn(UP)
+                    elif event.key == pygame.K_DOWN:
+                        self.turn(DOWN)
+                    elif event.key == pygame.K_LEFT:
+                        self.turn(LEFT)
+                    elif event.key == pygame.K_RIGHT:
+                        self.turn(RIGHT)
+        
                     
 #Creation Of The Food Class
 class FOOD(object):
@@ -103,7 +128,15 @@ DOWN = (0, 1)
 LEFT = (-1, 0)
 RIGHT = (1, 0)
 
-def main():
+CurrentSnakeAndFood = ()
+
+def SetSnakeAndFood(snake, food):
+    CurrentSnakeAndFood = (snake, food)
+
+def GetCurrentSnakeAndFood():
+    return CurrentSnakeAndFood
+
+def Snake_Main():
 
 
     pygame.init()
@@ -119,8 +152,6 @@ def main():
 
     myfont = pygame.font.SysFont("monospace", 16)
 
-    score = 0
-    highscore = 0
     while(True):
         
         clock.tick(10)
@@ -129,48 +160,54 @@ def main():
         
         DrawGrid(surface)
         snake.move()
+        
+        #print(snake.direction)
 
-        sx, sy = snake.getHeadPosition()
-        fx, fy = food.position
 
-
-        #Basic Bot
-        if sx > fx: #Go Left
-            snake.turn(LEFT)
-        elif sx < fx: #Go Right
-            snake.turn(RIGHT)
-        elif sy < fy: #Go Down
-            snake.turn(DOWN)
-        elif sy > fy: #Go Up
-            snake.turn(UP)
+        if HAS_SNAKE_AI == True:
+        
+            SnakeHead_X, SnakeHead_Y = snake.getHeadPosition()
+    
+            #Get Food Position
+            Food_X, Food_Y = food.position
+                
+            if SnakeHead_X > Food_X: #Go Left
+                snake.SNAKE_LEFT()
+            elif SnakeHead_X < Food_X: #Go Right
+                snake.SNAKE_RIGHT()
+            elif SnakeHead_Y < Food_Y: #Go Down
+                snake.SNAKE_DOWN()
+            elif SnakeHead_Y > Food_Y: #Go Up
+                snake.SNAKE_UP()
 
         #resets score when snake dies
         if snake.dead == 1:
             snake.dead = 0
-            if score >= highscore:
-                highscore = score
-            score = 0
+            global SCORE
+            global HIGHSCORE
+            if SCORE >= HIGHSCORE:
+                HIGHSCORE = SCORE
+            SCORE = 0
         
 
         if snake.getHeadPosition() == food.position:
             snake.length += 1
-            score += 1
+            SCORE += 1
             food.randomizePosition()
             
         snake.draw(surface)
         food.draw(surface)
         
         screen.blit(surface, (0,0))
-        text = myfont.render("Score {0}".format(score), 1, (0, 0, 0))
+        text = myfont.render("Score {0}".format(SCORE), 1, (0, 0, 0))
         screen.blit(text, (5, 10))
 
-
-        hstext = myfont.render("High Score {0}".format(highscore), 1, (0, 0, 0))
+        hstext = myfont.render("High Score {0}".format(HIGHSCORE), 1, (0, 0, 0))
         screen.blit(hstext, (SCREEN_WIDTH-145, 10))
         
         pygame.display.update()
 
 
-main()
+##Snake_Main()
 
         
