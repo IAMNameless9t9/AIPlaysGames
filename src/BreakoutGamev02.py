@@ -1,6 +1,7 @@
 import sys
 import pygame
 import time
+import random
 
 SCREEN_HEIGHT = 560
 SCREEN_WIDTH = 820
@@ -167,7 +168,8 @@ class BALL(object):
     def __init__(self):
         self.color1 = (0, 255, 0)
         self.color2 = (200, 200, 200)
-        self.position = (((SCREEN_WIDTH/2)-8),(7 * (SCREEN_HEIGHT / 8)-17))
+        randomStartPos = random.randint(50, SCREEN_WIDTH-50)
+        self.position = (((randomStartPos)-8),(7 * (SCREEN_HEIGHT / 8)-17))
         self.body1 = pygame.Rect(self.position, (16, 16))
         x, y = self.position
         self.body2 = pygame.Rect((x+4, y+4),(8, 8))
@@ -175,8 +177,10 @@ class BALL(object):
         self.bottomright = (x + 16, y + 16)
         self.hitbox = (self.position, self.bottomright)
 
+        choices = [-1, 1]
+        choice = random.randint(0, 1)
         self.yVel = -1
-        self.xVel = 1
+        self.xVel = choices[choice]
 
     def draw(self, surface):
         self.color1 = (min(255, SCORE/50), max(0, 255-(SCORE/50)), 0)
