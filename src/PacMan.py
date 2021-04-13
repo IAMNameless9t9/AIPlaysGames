@@ -13,8 +13,12 @@ counter = 0
 mode = 0
 modeCt = 0
 hidden = False
-speed = 10 #make this higher to control game speed
+speed = 1 #make this higher to control game speed
 running = True
+reset = False
+score = 0
+highScore = 0
+wins = 0     
 reflex_agent = False
 
 #================================
@@ -151,6 +155,10 @@ class Pacman:
         global modeCt
         global height
         global width
+        global reset
+        global score
+        global wins
+        global highScore  
         found = False
         for i in range(0,x,mult):
             for j in range(0,y,mult):
@@ -205,15 +213,17 @@ class Pacman:
                     if (((self.old > 4 and self.type == 5) or
                         (self.old == 5 and self.type > 4))
                         and mode == 0):
-                        print("Game over!")
-                        input("Press Enter to close")
-                        running = False
-                        pygame.quit()
+                        reset = True
+                        if score > highScore:
+                            highScore = score
+                        score = 0
+                        wins = 0                      
+                        return                        
                     if not any(2 in x for x in board):
-                        print("You win!")
-                        input("Press Enter to close")
-                        running = False
-                        pygame.quit()
+                        if reset == False:
+                            wins = wins + 1
+                        reset = True
+                        return
                     if self.type == 5 and self.old == 3:
                         self.old = 0
                         mode = 1
@@ -241,6 +251,49 @@ def updateBoard(screen):
             elif p == 4:
                 pygame.draw.rect(screen,(255,255,255),(i,j,mult-1,mult-1))
 
+def resetBoard():
+    global board
+    board = [[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+         [1,6,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,7,1],
+         [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+         [1,3,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,3,1],
+         [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+         [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+         [1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1],
+         [1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1],
+         [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
+         [1,1,1,1,1,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,1,1,1,1,1],
+         [1,1,1,1,1,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,1,1,1,1,1],
+         [1,1,1,1,1,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,1,1,1,1,1],
+         [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
+         [1,1,1,1,1,1,2,1,1,0,1,0,0,0,0,0,0,1,0,1,1,2,1,1,1,1,1,1],
+         [0,0,0,0,0,0,2,0,0,0,1,0,0,0,0,0,0,1,0,0,0,2,0,0,0,0,0,0],
+         [1,1,1,1,1,1,2,1,1,0,1,0,0,0,0,0,0,1,0,1,1,2,1,1,1,1,1,1],
+         [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
+         [1,1,1,1,1,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,1,1,1,1,1],
+         [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
+         [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
+         [1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1],
+         [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+         [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+         [1,3,2,2,1,1,2,2,2,2,2,2,2,5,2,2,2,2,2,2,2,2,1,1,2,2,3,1],
+         [1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1],
+         [1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1],
+         [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
+         [1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1],
+         [1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1],
+         [1,8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,9,1],
+         [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]]
+
+def countScore():
+    global board
+    s = 0
+    for i in range(len(board)):
+        for j in range(len(board[i])):
+            if board[i][j] == 2 or board[i][j] == 3:
+                s = s + 1
+    return 241 - s
+    
 def pacmanAgent(pac,g1,g2,g3,g4):
     px = pac.point[0]
     py = pac.point[1]
@@ -301,7 +354,8 @@ def PacMan_Main():
     
     global x
     global y
-    screen = pygame.display.set_mode([x,y])
+    global mult
+    screen = pygame.display.set_mode([x,y+mult])
 
     updateBoard(screen)
 
@@ -366,6 +420,31 @@ def PacMan_Main():
                     blinky.color = (255,0,0)
                     pinky.color = (255,184,255)
                     clyde.color = (255,184,82)
+            global score
+            global wins
+            global highScore
+            old = score
+            score = (wins * 241) + countScore()
+            if score < old:
+                score = old
+            outScore = "Score: " + str(score) + "     Highscore: " + str(highScore)
+            font = pygame.font.SysFont('aerial', mult)
+            text = font.render(outScore,True,(255,255,255))
+            textRect = text.get_rect()
+            textRect.center = (x/2,y+(mult/2))
+            screen.blit(text,textRect)
+        
+            global reset
+            if reset == True:
+                score = 0
+                reset = False
+                pacman = Pacman(5)
+                inky = Pacman(6)
+                blinky = Pacman(7)
+                pinky = Pacman(8)
+                clyde = Pacman(9)
+                resetBoard()
+                updateBoard(screen)
         if counter > 999999999:
             counter = 0
         pygame.display.flip()
