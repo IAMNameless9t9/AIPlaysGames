@@ -4,10 +4,13 @@ import sys
 
 from SNAKE import Snake_Main
 from SNAKE import SETUP_SNAKE_AI
+from SNAKE import SETUP_SNAKE_NEURAL
 from BreakoutGamev02 import Breakout_Main
 from BreakoutGamev02 import SETUP_BREAKOUT_AI
+#Import NeuralSetup Here
 from PacMan import PacMan_Main
 from PacMan import SETUP_PACMAN_AI
+#Import NeuralSetup Here
 
 ENABLE_DARK_MODE = True
 
@@ -84,6 +87,7 @@ YPos = 250
 Dist = 50
 
 ButtonColor = "white"
+instButtonColor = "grey"
 #=============================
 if ENABLE_DARK_MODE == False:
     ButtonColor = "black"
@@ -91,20 +95,21 @@ else:
     ButtonColor = "white"
 #=============================
     
-Snake_Button = Button("green", "Start Snake", (XPos,YPos))
-Breakout_Button = Button("blue", "Start Breakout", (XPos,YPos - Dist))
+Breakout_Button = Button("blue", "Start Breakout", (XPos,YPos))
+Snake_Button = Button("green", "Start Snake", (XPos,YPos - Dist))
 PacMan_Button = Button("gold", "Start PacMan", (XPos,YPos - Dist * 2))
 QuitButton = Button("red", "Quit Program", (XPos,YPos - Dist * 3))
 
-AI_Button = Button(ButtonColor, "Start As AI", (XPos,YPos - Dist * 5))
+AI_Button = Button(ButtonColor, "Start As Agent", (XPos,YPos - Dist * 4))
+NN_Button = Button(ButtonColor, "Start As Neural Network", (XPos,YPos - Dist * 5))
 User_Button = Button(ButtonColor, "Start As User", (XPos,YPos - Dist * 6))
 
-Instructions_Button_Games = Button(ButtonColor, "Use Up And Down Arrows To Choose Game", (XPos,YPos - Dist * 8))
-Instructions_Button_AIToggle = Button(ButtonColor, "Press 1 For AI, Press 0 For User", (XPos,YPos - Dist * 9))
-Instructions_Button_Selection = Button(ButtonColor, "Press Enter To Execute Game", (XPos,YPos - Dist * 10))
+Instructions_Button_Games = Button(instButtonColor, "Use Up And Down Arrows To Choose Game", (XPos,YPos - Dist * 8))
+Instructions_Button_AIToggle = Button(instButtonColor, "Press 1 and 0 To Go Up And Down AI Menu", (XPos,YPos - Dist * 9))
+Instructions_Button_Selection = Button(instButtonColor, "Press Enter To Execute Game", (XPos,YPos - Dist * 10))
 
 Game_Cursor = Cursor((-325,250), Dist, YPos, YPos-Dist*3)
-AI_Cursor = Cursor((-325, YPos-Dist*5), Dist, (YPos-Dist*5), (YPos-Dist*6))
+AI_Cursor = Cursor((-325, YPos-Dist*5), Dist, (YPos-Dist*4), (YPos-Dist*6))
 
 def MAIN(): 
     
@@ -120,18 +125,24 @@ def MAIN():
         if (Game_Cursor.Body.ycor() == Snake_Button.Body.ycor() and Game_Cursor.SelectionMade() == True):
             if (AI_Cursor.Body.ycor() == AI_Button.Body.ycor()):
                 SETUP_SNAKE_AI(True)
+            elif (AI_Cursor.Body.ycor() == NN_Button.Body.ycor()):
+                SETUP_SNAKE_NEURAL(True)
             Snake_Main()
             
             
         if (Game_Cursor.Body.ycor() == Breakout_Button.Body.ycor() and Game_Cursor.SelectionMade() == True):
             if (AI_Cursor.Body.ycor() == AI_Button.Body.ycor()):
                 SETUP_BREAKOUT_AI(True)
+            elif (AI_Cursor.Body.ycor() == NN_Button.Body.ycor()):
+                pass #NN Setup Function Here
             Breakout_Main()
             
             
         if (Game_Cursor.Body.ycor() == PacMan_Button.Body.ycor() and Game_Cursor.SelectionMade() == True):
             if (AI_Cursor.Body.ycor() == AI_Button.Body.ycor()):
                 SETUP_PACMAN_AI(True)
+            elif (AI_Cursor.Body.ycor() == NN_Button.Body.ycor()):
+                pass #NN Setup Function Here
             PacMan_Main()
             
         if (Game_Cursor.Body.ycor() == QuitButton.Body.ycor() and Game_Cursor.SelectionMade() == True):
