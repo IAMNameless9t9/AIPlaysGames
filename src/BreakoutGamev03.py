@@ -14,13 +14,24 @@ SCORE = 0
 HIGHSCORE = 0
 DEATHS = 0
 
-SIMPLE_REFLEX_AGENT = True
-NEURAL_NETWORK_ACTIVE = True
+SIMPLE_REFLEX_AGENT = False
+NEURAL_NETWORK_ACTIVE = False
+
+#================================
+def SETUP_BREAKOUT_NEURAL(Setting):
+    
+    global NEURAL_NETWORK_ACTIVE
+    global SIMPLE_REFLEX_AGENT
+    if Setting == True:
+        NEURAL_NETWORK_ACTIVE = True
+        SIMPLE_REFLEX_AGENT = True
+    else:
+        NEURAL_NETWORK_ACTIVE = False
+#================================
 
 def SETUP_BREAKOUT_AI(Setting):
 
     global SIMPLE_REFLEX_AGENT
-    global NEURAL_NETWORK_ACTIVE
     if Setting == True:
         SIMPLE_REFLEX_AGENT = True
     else:
@@ -337,7 +348,10 @@ def Breakout_Main():
         
         screen.fill((0, 0, 0))
 
-        ghost.draw(screen)
+        global SETUP_BREAKOUT_AI
+        global SETUP_BREAKOUT_NEURAL
+        if SETUP_BREAKOUT_AI == False and SETUP_BREAKOUT_NEURAL == False:
+            ghost.draw(screen)
         paddle.draw(screen)
         border.draw(screen)
         ball.draw(screen)
@@ -444,4 +458,4 @@ def Breakout_Main():
     #pygame.quit()
     #sys.exit()
 
-Breakout_Main()
+##Breakout_Main()

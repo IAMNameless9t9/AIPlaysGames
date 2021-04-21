@@ -29,6 +29,7 @@ randomness = 1 #1 for fully random, 0 for fully smart. decrements based on learn
 dotX = random.randint(0,width-1) #these are coordinates for a pellet for pacman to seek
 dotY = random.randint(0,height-1)
 reflex_agent = False #true to have ai play, false to play the game as a human
+neural_network = False #true to have nn play, false to play the game as a human or agent
 
 #below is the initial board state. each number corresponds to a particular entity
 #0: empty
@@ -41,7 +42,15 @@ reflex_agent = False #true to have ai play, false to play the game as a human
 #7: blinky
 #8: pinky
 #9: clyde
-
+#================================
+def SETUP_PACMAN_NEURAL(Setting):
+    
+    global neural_network
+    if Setting == True:
+        neural_network = True
+    else:
+        neural_network = False
+#================================
 #================================
 def SETUP_PACMAN_AI(Setting):
 
