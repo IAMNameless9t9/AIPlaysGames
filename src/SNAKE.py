@@ -9,6 +9,9 @@ SCORE = 0
 HIGHSCORE = 0
 GENERATION = 0
 ALLOW_EXPORTING = False
+
+DEATHS = 0
+CURRENT_AVERAGE = 0
 #================================
 def SETUP_SNAKE_NEURAL(Setting):
     
@@ -416,12 +419,19 @@ def Snake_Main():
 
         #resets score when snake dies
         if snake.dead == 1:
+            global DEATHS
+            DEATHS += 1
             snake.dead = 0
             global SCORE
             global HIGHSCORE
             if SCORE >= HIGHSCORE:
                 HIGHSCORE = SCORE
             SCORE = 0
+            
+            global CURRENT_AVERAGE
+            CURRENT_AVERAGE + CURRENT_AVERAGE * DEATHS
+            CURRENT_AVERAGE += SCORE
+            CURRENT_AVERAGE = CURRENT_AVERAGE / DEATHS
         
         #Wall Collisions
         SnakeHeadX, SnakeHeadY = snake.getHeadPosition()
@@ -454,6 +464,9 @@ def Snake_Main():
         
         text = myfont.render("Iteration {0}".format(GENERATION), 1, (0, 0, 0))
         screen.blit(text, ((SCREEN_WIDTH/3), 25))
+
+        #temp = double(CURRENT_AVERAGE)
+        #print("Current Accuracy: " + str(temp))
 
         hstext = myfont.render("High Score {0}".format(HIGHSCORE), 1, (0, 0, 0))
         screen.blit(hstext, (SCREEN_WIDTH-165, 25))
