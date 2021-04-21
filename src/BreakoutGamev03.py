@@ -1,28 +1,46 @@
 import sys
 import pygame
 import time
+import random
+import math
+import numpy as np
+from datetime import datetime
 
 SCREEN_HEIGHT = 560
 SCREEN_WIDTH = 820
 GAME_RUNNING = True
+GAME_OVER = False
 SCORE = 0
+HIGHSCORE = 0
+DEATHS = 0
 
-SIMPLE_REFLEX_AGENT = False
+SIMPLE_REFLEX_AGENT = True
+NEURAL_NETWORK_ACTIVE = True
 
 def SETUP_BREAKOUT_AI(Setting):
 
     global SIMPLE_REFLEX_AGENT
+    global NEURAL_NETWORK_ACTIVE
     if Setting == True:
         SIMPLE_REFLEX_AGENT = True
     else:
         SIMPLE_REFLEX_AGENT = False
 
+def sigmoid(x):
+    s = 1.0/(1+np.exp(-x))
+    return s
+
+def sigmoid_derivative(x):
+    s = sigmoid(x)
+    ds = s*(1.0-s)
+    return ds
+
 class PADDLE(object):
 
-    def __init__(self):
+    def __init__(self, rgb):
         self.width = 100
         self.position = (((SCREEN_WIDTH / 2) - (self.width / 2)), (7 * (SCREEN_HEIGHT / 8)))
-        self.color = (200, 200, 200)
+        self.color = (rgb, rgb, rgb)
         self.baseSpeed = 5
         self.curSpeed = 0
         self.body = pygame.Rect(self.position, (self.width, 10))
@@ -56,6 +74,18 @@ class PADDLE(object):
             elif dx < border.xMax and self.rightDown:
                 self.body.move_ip(self.curSpeed, 0)
                 self.hitbox = ((x + self.curSpeed, y),(dx + self.curSpeed, dy))
+
+    def smartMove(self, border, decision):
+        (x, y) , (dx, dy) = self.hitbox
+        
+        if x > border.xMin and decision[0][0] > 1.5 * decision[0][1]:
+            self.curSpeed = -self.baseSpeed
+            self.body.move_ip(self.curSpeed, 0)
+            self.hitbox = ((x + self.curSpeed, y),(dx + self.curSpeed, dy))
+        elif dx < border.xMax and 1.5 * decision[0][0] < decision[0][1]:
+            self.curSpeed = self.baseSpeed
+            self.body.move_ip(self.curSpeed, 0)
+            self.hitbox = ((x + self.curSpeed, y),(dx + self.curSpeed, dy))
 
     def handleKeys(self):
         for event in pygame.event.get():
@@ -167,7 +197,8 @@ class BALL(object):
     def __init__(self):
         self.color1 = (0, 255, 0)
         self.color2 = (200, 200, 200)
-        self.position = (((SCREEN_WIDTH/2)-8),(7 * (SCREEN_HEIGHT / 8)-17))
+        randomStartPos = random.randint(50, SCREEN_WIDTH-50)
+        self.position = (((randomStartPos)-8),(7 * (SCREEN_HEIGHT / 8)-17))
         self.body1 = pygame.Rect(self.position, (16, 16))
         x, y = self.position
         self.body2 = pygame.Rect((x+4, y+4),(8, 8))
@@ -175,8 +206,10 @@ class BALL(object):
         self.bottomright = (x + 16, y + 16)
         self.hitbox = (self.position, self.bottomright)
 
+        choices = [-1, 1]
+        choice = random.randint(0, 1)
         self.yVel = -1
-        self.xVel = 1
+        self.xVel = choices[choice]
 
     def draw(self, surface):
         self.color1 = (min(255, SCORE/50), max(0, 255-(SCORE/50)), 0)
@@ -195,10 +228,10 @@ class BALL(object):
             self.xVel = -1 * self.xVel
         elif y <= border.yMin:
             self.yVel = -1 * self.yVel
-        elif dy >= border.yMax:
-            global GAME_RUNNING
-            GAME_RUNNING = False
-        elif dy == py and dx >= (px + 25) and x <= (pdx - 25):
+        elif dy+20 >= border.yMax:
+            global GAME_OVER
+            GAME_OVER = True
+        elif dy == py and dx > (px + 25) and x < (pdx - 25):
             self.yVel = -1 * self.yVel
         elif dy == py and dx >= px and x <= (px + 25):
             self.yVel = -1 * self.yVel
@@ -236,19 +269,28 @@ class BALL(object):
         self.body2.move_ip(self.xVel, self.yVel)
         self.hitbox = ((x + self.xVel, y + self.yVel),(dx + self.xVel, dy + self.yVel))
 
+class NeuralNetwork:
+
+    def __init__(self):
+        self.IHWeights = np.random.rand(8,8)
+        self.HOWeights = np.random.rand(8,2)
+        self.output = np.zeros(2)
+
+    def feedForward(self, x):
+        self.hiddenLayer = sigmoid(np.dot(x,self.IHWeights))
+        self.output = sigmoid(np.dot(self.hiddenLayer, self.HOWeights))
+
+    def backPropagate(self, y):
+        d_HOWeights = np.dot(self.hiddenLayer.T, (2*(y - self.output) * sigmoid_derivative(self.output))) + 0.01
+        d_IHWeights = np.dot(self.hiddenLayer.T, (np.dot(2*(y - self.output) * sigmoid_derivative(self.output), self.HOWeights.T) * sigmoid_derivative(self.hiddenLayer))) + 0.01
+
+        self.HOWeights += d_HOWeights
+        self.IHWeights += d_IHWeights
+
 #=========================================================================#
 #
-# BREAKOUT v0.2
+# BREAKOUT v0.3
 # By: Nathanael L. Mann
-#
-# TODO:
-#
-#   Ball Launch
-#
-#   Lives?
-#   Level Reset?
-#   Power Ups?
-#   Level Design Randomization?
 #
 #=========================================================================#
 def Breakout_Main():
@@ -259,9 +301,11 @@ def Breakout_Main():
     surface = pygame.Surface(screen.get_size())
     surface = surface.convert()
 
-    paddle = PADDLE()
+    ghost = PADDLE(50)
+    paddle = PADDLE(200)
     border = BORDER()
     ball = BALL()
+    neuralNetwork = NeuralNetwork()
     bricksX = int ((SCREEN_WIDTH - (border.thickness * 2)) / 60)
     bricksY = int (((SCREEN_WIDTH - (border.thickness * 2)) / 60) - 3)
     bricksGap = 40
@@ -282,6 +326,10 @@ def Breakout_Main():
     myfont = pygame.font.SysFont("broadway", 24)
 
     global GAME_RUNNING
+    global GAME_OVER
+    global SCORE
+    global HIGHSCORE
+    global DEATHS
     while GAME_RUNNING:
 
         if len(bricks) == 0:
@@ -289,6 +337,7 @@ def Breakout_Main():
         
         screen.fill((0, 0, 0))
 
+        ghost.draw(screen)
         paddle.draw(screen)
         border.draw(screen)
         ball.draw(screen)
@@ -296,7 +345,30 @@ def Breakout_Main():
             brick.draw(screen)
 
         paddle.handleKeys()
-        paddle.move(border, ball)
+        
+        if NEURAL_NETWORK_ACTIVE:
+            (bx, by), (bdx, bdy) = ball.hitbox
+            bxv = ball.xVel
+            byv = ball.yVel
+            (px, py), (pdx, pdy) = paddle.hitbox
+                        
+            inputs = np.array([[bx/10, bdx/10, by/10, bdy/10, bxv, byv, px/10, pdx/10]])
+            neuralNetwork.feedForward(inputs)
+            decision = np.array(neuralNetwork.output)
+            paddle.smartMove(border, decision)
+
+            #UPDATE NEURAL NETWORK EVERY STEP
+            if px > bx:
+                correctAnswer = np.array([[1.0, 0.0]])
+            elif pdx < bdx:
+                correctAnswer = np.array([[0.0, 1.0]])
+            else:
+                correctAnswer = np.array([[0.0, 0.0]])
+            neuralNetwork.backPropagate(correctAnswer)
+        else:
+            paddle.move(border, ball)
+
+        ghost.move(border, ball)
 
         step = 0
         while step < ballSpeed:
@@ -305,12 +377,59 @@ def Breakout_Main():
 
         ballSpeed = min(5, (int(SCORE / 2500) + 1))
 
-        text = myfont.render("Score {0}".format(SCORE), 1, (255, 255, 255))
+        if SCORE > HIGHSCORE:
+            HIGHSCORE = SCORE
+            now = datetime.now()
+            currentTime = now.strftime("%H:%M:%S")
+            print(currentTime, "| New High Score:", HIGHSCORE, "in", DEATHS, "deaths.")
+
+        text = myfont.render("Score: {0}".format(SCORE), 1, (255, 255, 255))
         screen.blit(text, (30, SCREEN_HEIGHT-30))
+        text = myfont.render("High Score: {0}".format(HIGHSCORE), 1, (255, 255, 255))
+        screen.blit(text, (300, SCREEN_HEIGHT-30))
+        text = myfont.render("Deaths: {0}".format(DEATHS), 1, (255, 255, 255))
+        screen.blit(text, (620, SCREEN_HEIGHT-30))
+        #probL = neuralNetwork.output[0][0]
+        #probR = neuralNetwork.output[0][1]
+        #confidence = abs(probL - probR)
+        #text = myfont.render("Confidence: {0}".format(confidence), 1, (255, 255, 255))
+        #screen.blit(text, (30, 30))
+        
         
         pygame.display.update()
 
         clock.tick(120)
+
+        if(GAME_OVER):
+
+            #UPDATE NEURAL NETWORK ONLY ON DEATH
+            #if px > bx:
+                #correctAnswer = np.array([[1.0, 0.0]])
+            #elif pdx < bdx:
+                #correctAnswer = np.array([[0.0, 1.0]])
+            #else:
+                #correctAnswer = np.array([[0.0, 0.0]])
+            #neuralNetwork.backPropagate(correctAnswer)
+            
+            time.sleep(0.25)
+            ghost = PADDLE(50)
+            paddle = PADDLE(200)
+            ball = BALL()
+            bricks = [BRICK(border.thickness, border.thickness + bricksGap)] * NumberofBricks
+            ballSpeed = 1
+            GAME_OVER = False
+            SCORE = 0
+            DEATHS += 1
+            
+            i = border.thickness
+            k = 0
+            while i < 60 * bricksX:
+                j = bricksGap + border.thickness
+                while j < (20 * bricksY) + bricksGap + border.thickness:
+                    bricks[k] = BRICK(i, j)
+                    k += 1
+                    j += 20
+                i += 60
 
     myfont = pygame.font.SysFont("broadway", 32)
     if len(bricks) == 0:
@@ -321,8 +440,8 @@ def Breakout_Main():
         screen.blit(text, ((SCREEN_WIDTH/2)-108, (SCREEN_HEIGHT/2)-16))
     pygame.display.update()
 
-    time.sleep(5)
-    pygame.quit()
-    ##sys.exit()
+    #time.sleep(5)
+    #pygame.quit()
+    #sys.exit()
 
-##Breakout_Main()
+Breakout_Main()
