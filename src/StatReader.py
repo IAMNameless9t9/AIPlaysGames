@@ -5,9 +5,9 @@ import sys
 from SNAKE import Snake_Main
 from SNAKE import SETUP_SNAKE_AI
 from SNAKE import SETUP_SNAKE_NEURAL
-from BreakoutGamev02 import Breakout_Main
-from BreakoutGamev02 import SETUP_BREAKOUT_AI
-#Import NeuralSetup Here
+from BreakoutGamev03 import Breakout_Main
+from BreakoutGamev03 import SETUP_BREAKOUT_AI
+from BreakoutGamev03 import SETUP_BREAKOUT_NEURAL
 from PacMan import PacMan_Main
 from PacMan import SETUP_PACMAN_AI
 #Import NeuralSetup Here
@@ -134,7 +134,7 @@ def MAIN():
             if (AI_Cursor.Body.ycor() == AI_Button.Body.ycor()):
                 SETUP_BREAKOUT_AI(True)
             elif (AI_Cursor.Body.ycor() == NN_Button.Body.ycor()):
-                pass #NN Setup Function Here
+                SETUP_BREAKOUT_NEURAL(True)
             Breakout_Main()
             
             
@@ -142,7 +142,7 @@ def MAIN():
             if (AI_Cursor.Body.ycor() == AI_Button.Body.ycor()):
                 SETUP_PACMAN_AI(True)
             elif (AI_Cursor.Body.ycor() == NN_Button.Body.ycor()):
-                pass #NN Setup Function Here
+                SETUP_PACMAN_AI(True)
             PacMan_Main()
             
         if (Game_Cursor.Body.ycor() == QuitButton.Body.ycor() and Game_Cursor.SelectionMade() == True):

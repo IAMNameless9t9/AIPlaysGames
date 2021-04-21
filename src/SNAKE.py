@@ -2,7 +2,6 @@
 import pygame
 import sys
 import random
-from NeuralNetwork import NN
 import numpy as np
 
 HAS_SNAKE_AI = False
@@ -27,6 +26,32 @@ def SETUP_SNAKE_AI(Setting):
     else:
         HAS_SNAKE_AI = False
 #================================
+
+def sigmoid(x):
+    return 1.0/(1+ np.exp(-x))
+
+def sigmoid_derivative(x):
+    return x * (1.0 - x)
+
+class NN:
+    def __init__(self, numOfInput, numOfOutput):
+        self.NumOfInputs = numOfInput
+        self.NumOfOutputs = numOfOutput
+        self.IHWeights = np.random.rand(self.NumOfInputs,self.NumOfInputs)
+        self.HOWeights = np.random.rand(self.NumOfInputs,self.NumOfOutputs)
+        self.output = np.zeros(self.NumOfOutputs)
+
+    def feedForward(self, x):
+        self.hiddenLayer = sigmoid(np.dot(x,self.IHWeights))
+        self.output = sigmoid(np.dot(self.hiddenLayer, self.HOWeights))
+
+    def backPropagate(self, y):
+        d_HOWeights = np.dot(self.hiddenLayer.T, (2*(y - self.output) * sigmoid_derivative(self.output)))
+        d_IHWeights = np.dot(self.hiddenLayer.T, (np.dot(2*(y - self.output) * sigmoid_derivative(self.output), self.HOWeights.T) * sigmoid_derivative(self.hiddenLayer)))
+
+        self.HOWeights += d_HOWeights
+        self.IHWeights += d_IHWeights
+
 #Creation Of The Snake Class
 class SNAKE(object):
 
@@ -427,7 +452,7 @@ def Snake_Main():
         text = myfont.render("Score {0}".format(SCORE), 1, (0, 0, 0))
         screen.blit(text, (35, 25))
         
-        text = myfont.render("Generation {0}".format(GENERATION), 1, (0, 0, 0))
+        text = myfont.render("Iteration {0}".format(GENERATION), 1, (0, 0, 0))
         screen.blit(text, ((SCREEN_WIDTH/3), 25))
 
         hstext = myfont.render("High Score {0}".format(HIGHSCORE), 1, (0, 0, 0))
