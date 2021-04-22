@@ -45,12 +45,12 @@ class NN:
         self.output = np.zeros(self.NumOfOutputs)
 
     def feedForward(self, x):
-        self.hiddenLayer = sigmoid(np.dot(x,self.IHWeights))
+        self.hiddenLayer = sigmoid(np.dot(x + 0.1,self.IHWeights))
         self.output = sigmoid(np.dot(self.hiddenLayer, self.HOWeights))
 
     def backPropagate(self, y):
-        d_HOWeights = np.dot(self.hiddenLayer.T, (2*(y - self.output) * sigmoid_derivative(self.output)))
-        d_IHWeights = np.dot(self.hiddenLayer.T, (np.dot(2*(y - self.output) * sigmoid_derivative(self.output), self.HOWeights.T) * sigmoid_derivative(self.hiddenLayer)))
+        d_HOWeights = np.dot(self.hiddenLayer.T, (4*(y - self.output) * sigmoid_derivative(self.output)))
+        d_IHWeights = np.dot(self.hiddenLayer.T, (np.dot(4*(y - self.output) * sigmoid_derivative(self.output), self.HOWeights.T) * sigmoid_derivative(self.hiddenLayer)))
 
         self.HOWeights += d_HOWeights
         self.IHWeights += d_IHWeights
@@ -114,7 +114,7 @@ class SNAKE(object):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-            if HAS_SNAKE_AI == False:
+            if HAS_SNAKE_AI == False and ALLOW_EXPORTING == False:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
                         self.turn(UP)
@@ -207,16 +207,16 @@ def Snake_Main():
 
     snake = SNAKE()
     food = FOOD()
+    #neuralNet = NN(12, 4)
     neuralNet = NN(12, 4)
 
     myfont = pygame.font.SysFont("monospace", 16)
 
     while(True):
         
-        clock.tick(10)
+        clock.tick(15)
         
-        if ALLOW_EXPORTING == False and HAS_SNAKE_AI == False:
-            snake.handleKeys()
+        snake.handleKeys()
         
         DrawGrid(surface)
         DrawBoarder(surface)
@@ -318,6 +318,49 @@ def Snake_Main():
                 Head_Down = 0
                 Head_Left = 0
                 Head_Right = 1
+                
+                
+            if Head_Up == 1 and Below_Head == 1: #Food is behind snake below
+                Above_Head = 0
+                Below_Head = 1
+                Left_Head = 1
+                Right_Head = 1
+            elif Head_Down == 1 and Above_Head == 1: #Food is behind snake above
+                Above_Head = 1
+                Below_Head = 0
+                Left_Head = 1
+                Right_Head = 1
+            elif Head_Left == 1 and Right_Head == 1: #Food is behind snake right
+                Above_Head = 1
+                Below_Head = 1
+                Left_Head = 0
+                Right_Head = 1
+            elif Head_Right == 1 and Left_Head == 1: #Food is behind snake left
+                Above_Head = 1
+                Below_Head = 1
+                Left_Head = 1
+                Right_Head = 0
+                
+            #elif Head_Up == 1 and Above_Head == 1: #Food is front snake up
+                #Above_Head = 1
+                #Below_Head = 0
+                #Left_Head = 0
+                #Right_Head = 0
+            #elif Head_Down == 1 and Below_Head == 1: #Food is front snake down
+                #Above_Head = 0
+                #Below_Head = 1
+                #Left_Head = 0
+                #Right_Head = 0
+            #elif Head_Left == 1 and Left_Head == 1: #Food is front snake left
+                #Above_Head = 0
+                #Below_Head = 0
+                #Left_Head = 0
+                #Right_Head = 1
+            #elif Head_Right == 1 and Right_Head == 1: #Food is front snake right
+                #Above_Head = 0
+                #Below_Head = 0
+                #Left_Head = 0
+                #Right_Head = 1
             
             #Get The Current Tail Directions using head as a reference
             if TailX >= SnakeHeadX and TailY >= SnakeHeadY: #Going Up
