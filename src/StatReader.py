@@ -10,6 +10,7 @@ from BreakoutGamev03 import SETUP_BREAKOUT_AI
 from BreakoutGamev03 import SETUP_BREAKOUT_NEURAL
 from PacMan import PacMan_Main
 from PacMan import SETUP_PACMAN_AI
+from PacMan import SETUP_PACMAN_NEURAL
 #Import NeuralSetup Here
 
 ENABLE_DARK_MODE = True
@@ -145,7 +146,7 @@ def MAIN():
             if (AI_Cursor.Body.ycor() == AI_Button.Body.ycor()):
                 SETUP_PACMAN_AI(True)
             elif (AI_Cursor.Body.ycor() == NN_Button.Body.ycor()):
-                SETUP_PACMAN_AI(True)
+                SETUP_PACMAN_NEURAL(True)
             PacMan_Main()
             
         if (Game_Cursor.Body.ycor() == QuitButton.Body.ycor() and Game_Cursor.SelectionMade() == True):
