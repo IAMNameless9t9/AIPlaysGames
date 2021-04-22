@@ -22,7 +22,7 @@ def SETUP_BREAKOUT_NEURAL(Setting):
     
     global NEURAL_NETWORK_ACTIVE
     global SIMPLE_REFLEX_AGENT
-    if Setting == True:
+    if Setting:
         NEURAL_NETWORK_ACTIVE = True
         SIMPLE_REFLEX_AGENT = True
     else:
@@ -32,8 +32,9 @@ def SETUP_BREAKOUT_NEURAL(Setting):
 def SETUP_BREAKOUT_AI(Setting):
 
     global SIMPLE_REFLEX_AGENT
-    if Setting == True:
+    if Setting:
         SIMPLE_REFLEX_AGENT = True
+        NEURAL_NETWORK_ACTIVE = False
     else:
         SIMPLE_REFLEX_AGENT = False
 
@@ -350,7 +351,7 @@ def Breakout_Main():
 
         global SETUP_BREAKOUT_AI
         global SETUP_BREAKOUT_NEURAL
-        if SETUP_BREAKOUT_AI == False and SETUP_BREAKOUT_NEURAL == False:
+        if NEURAL_NETWORK_ACTIVE == True:
             ghost.draw(screen)
         paddle.draw(screen)
         border.draw(screen)

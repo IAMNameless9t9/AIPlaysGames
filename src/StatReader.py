@@ -135,6 +135,9 @@ def MAIN():
                 SETUP_BREAKOUT_AI(True)
             elif (AI_Cursor.Body.ycor() == NN_Button.Body.ycor()):
                 SETUP_BREAKOUT_NEURAL(True)
+            else:
+                SETUP_BREAKOUT_AI(False)
+                SETUP_BREAKOUT_NEURAL(False)
             Breakout_Main()
             
             
