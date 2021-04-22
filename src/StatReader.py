@@ -11,7 +11,6 @@ from BreakoutGamev03 import SETUP_BREAKOUT_NEURAL
 from PacMan import PacMan_Main
 from PacMan import SETUP_PACMAN_AI
 from PacMan import SETUP_PACMAN_NEURAL
-#Import NeuralSetup Here
 
 ENABLE_DARK_MODE = True
 
@@ -20,7 +19,7 @@ WINDOW = turtle.Screen()
 #=============================
 if ENABLE_DARK_MODE == False:
     WINDOW.bgcolor("white")
-else:
+elif ENABLE_DARK_MODE == True:
     WINDOW.bgcolor("black")
 #=============================
 
@@ -40,10 +39,10 @@ class Button:
         self.Text.penup()
         self.Text.goto(self.Body.xcor() + 20, self.Body.ycor() - 8)
         #=============================
-        if ENABLE_DARK_MODE == False:
-            self.Text.color("black")
-        else:
+        if ENABLE_DARK_MODE == True:
             self.Text.color("white")
+        elif ENABLE_DARK_MODE == False:
+            self.Text.color("black")
         #=============================
         self.Text.hideturtle()
         self.Text.write(self.textData, align="left", font=("Verdana", 10, "bold"))
@@ -88,29 +87,33 @@ YPos = 250
 Dist = 50
 
 ButtonColor = "white"
+TitleColor = "black"
 instButtonColor = "grey"
 #=============================
 if ENABLE_DARK_MODE == False:
     ButtonColor = "black"
-else:
+    TitleColor = "white"
+elif ENABLE_DARK_MODE == True:
     ButtonColor = "white"
+    TitleColor = "black"
 #=============================
-    
-Breakout_Button = Button("blue", "Start Breakout", (XPos,YPos))
-Snake_Button = Button("green", "Start Snake", (XPos,YPos - Dist))
-PacMan_Button = Button("gold", "Start PacMan", (XPos,YPos - Dist * 2))
-QuitButton = Button("red", "Quit Program", (XPos,YPos - Dist * 3))
 
-AI_Button = Button(ButtonColor, "Start As Agent", (XPos,YPos - Dist * 4))
-NN_Button = Button(ButtonColor, "Start As Neural Network", (XPos,YPos - Dist * 5))
-User_Button = Button(ButtonColor, "Start As User", (XPos,YPos - Dist * 6))
+Title_Button = Button(TitleColor, "          AI Learns to Play Retro Video Games\nAustin Brown, Nathanael L. Mann, Cooper Martin", (XPos + 100,YPos))
+  
+Game_Cursor = Cursor((-325,YPos-Dist), Dist, YPos-Dist, YPos-Dist*4)  
+Breakout_Button = Button("blue", "Start Breakout", (XPos,YPos - Dist))
+Snake_Button = Button("green", "Start Snake", (XPos,YPos - Dist * 2))
+PacMan_Button = Button("gold", "Start PacMan", (XPos,YPos - Dist * 3))
+QuitButton = Button("red", "Quit Program", (XPos,YPos - Dist * 4))
+
+AI_Cursor = Cursor((-325, YPos-Dist*5), Dist, (YPos-Dist*5), (YPos-Dist*7))
+AI_Button = Button(ButtonColor, "Start As Agent", (XPos,YPos - Dist * 5))
+NN_Button = Button(ButtonColor, "Start As Neural Network", (XPos,YPos - Dist * 6))
+User_Button = Button(ButtonColor, "Start As User", (XPos,YPos - Dist * 7))
 
 Instructions_Button_Games = Button(instButtonColor, "Use Up And Down Arrows To Choose Game", (XPos,YPos - Dist * 8))
 Instructions_Button_AIToggle = Button(instButtonColor, "Press 1 and 0 To Go Up And Down AI Menu", (XPos,YPos - Dist * 9))
 Instructions_Button_Selection = Button(instButtonColor, "Press Enter To Execute Game", (XPos,YPos - Dist * 10))
-
-Game_Cursor = Cursor((-325,250), Dist, YPos, YPos-Dist*3)
-AI_Cursor = Cursor((-325, YPos-Dist*5), Dist, (YPos-Dist*4), (YPos-Dist*6))
 
 def MAIN(): 
     
