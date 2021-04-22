@@ -3,6 +3,7 @@
 import pygame
 import time
 import random
+import numpy as np
 
 pygame.init()
 
@@ -24,8 +25,9 @@ score = 0 #number of eaten pellets on one life
 highScore = 0 #highest score achieved during session
 wins = 0 #number of times all pellets have been eaten on one life
 moveSync = 0 #only lets pacman & ghosts change direction every mult steps, prevents desync
+moves = 0 #number of squares pacman has moved
 learnRate = 0.001
-randomness = 1 #1 for fully random, 0 for fully smart. decrements based on learnRate
+randomness = 0 #1 for fully random, 0 for fully smart. decrements based on learnRate
 dotX = random.randint(0,width-1) #these are coordinates for a pellet for pacman to seek
 dotY = random.randint(0,height-1)
 reflex_agent = False #true to have ai play, false to play the game as a human
@@ -103,6 +105,33 @@ nodes = [1*width+1,1*width+6,1*width+12,1*width+15,1*width+21,1*width+26,
     23*width+1,23*width+3,23*width+6,23*width+9,23*width+12,23*width+15,23*width+18,23*width+21,23*width+24,23*width+26,
     26*width+1,26*width+3,26*width+6,26*width+9,26*width+12,26*width+15,26*width+18,26*width+21,26*width+24,26*width+26,
     29*width+1,29*width+12,29*width+15,29*width+26]
+
+def sigmoid(x):
+    return 1/(1 + np.exp(-x))
+
+def sigmoid_derivative(x):
+    s = sigmoid(x)
+    ds = s*(1-s)
+    return ds
+
+class NN:
+    def __init__(self):
+        self.IHWeights = np.random.rand(20,20)
+        self.HOWeights = np.random.rand(20,4)
+        self.output = np.zeros(4)
+
+    def feedForward(self, x):
+        self.hiddenLayer = sigmoid(np.dot(x,self.IHWeights))
+        self.output = sigmoid(np.dot(self.hiddenLayer, self.HOWeights))
+
+    def backPropagate(self, y):
+        d_HOWeights = np.dot(self.hiddenLayer.T, (4*(y - self.output) * sigmoid_derivative(self.output)))+0.01
+        d_IHWeights = np.dot(self.hiddenLayer.T, (np.dot(4*(y - self.output) * sigmoid_derivative(self.output), self.HOWeights.T) * sigmoid_derivative(self.hiddenLayer)))+0.01
+
+        self.HOWeights += d_HOWeights
+        self.IHWeights += d_IHWeights
+
+nn = NN()
 
 class Pacman:
     def __init__(self,ch):
@@ -200,11 +229,95 @@ class Pacman:
         global randomness
         global learnRate
         global steps
+        global moves
+        global nn
+        global neural_network
         found = False
         for i in range(0,x,mult):
             for j in range(0,y,mult):
                 p = board[int(j/mult)][int(i/mult)]
                 if p == self.type and not found: #perform operations when pacman/ghost has been found in board
+                    if neural_network and self.type == 5 and self.pacX % mult == int(mult/2) and self.pacY % mult == int(mult/2) and moveSync == 0:
+                        p5x = -1
+                        p5y = -1
+                        p6x = -1
+                        p6y = -1
+                        p7x = -1
+                        p7y = -1
+                        p8x = -1
+                        p8y = -1
+                        p9x = -1
+                        p9y = -1
+                        for it in range(len(board)):
+                            for jt in range(len(board[it])):
+                                if board[it][jt] == 5:
+                                    p5x = jt
+                                    p5y = it
+                                elif board[it][jt] == 6:
+                                    p6x = jt
+                                    p6y = it
+                                elif board[it][jt] == 7:
+                                    p7x = jt
+                                    p7y = it
+                                elif board[it][jt] == 8:
+                                    p8x = jt
+                                    p8y = it
+                                elif board[it][jt] == 9:
+                                    p9x = jt
+                                    p9y = it
+                        ap6x = abs(p6x-p5x)
+                        ap6y = abs(p6y-p5y)
+                        ap7x = abs(p7x-p5x)
+                        ap7y = abs(p7y-p5y)
+                        ap8x = abs(p8x-p5x)
+                        ap8y = abs(p8y-p5y)
+                        ap9x = abs(p9x-p5x)
+                        ap9y = abs(p9y-p5y)
+                        moves = moves + 1
+                        if board[dotY][dotX] != 2 and board[dotY][dotX] != 3:
+                            findDot(p5x,p5y)
+                        arr = np.array([[board[p5y-1][p5x],board[p5y][p5x-1],board[p5y+1][p5x],board[p5y][p5x+1],p5x,p5y,p6x,p6y,p7x,p7y,p8x,p8y,p9x,p9y,dotX,dotY,score,score-0.1*moves,mode,mode==0 or modeCt>=900]])
+                        for it in range(4):
+                            if arr[0][it] == 1:
+                                arr[0][it] = -0.5/100
+                            elif arr[0][it] > 5:
+                                arr[0][it] = -10/100
+                                if mode == 1 and modeCt < 900:
+                                    arr[0][it] = 10/100
+                            elif arr[0][it] == 2:
+                                arr[0][it] = 2/100
+                            elif arr[0][it] == 3:
+                                arr[0][it] = 5/100
+                            else:
+                                arr[0][it] = -0.2
+                        nn.feedForward(arr)
+                        highest = max(nn.output[0])
+                        ch = -1
+                        for it in range(4):
+                            if nn.output[0][it] == highest:
+                                ch = it
+                        eps = random.random()
+                        if eps < 0.98:
+                            self.move(ch)
+                        else:
+                            self.move(random.randint(0,3))
+                        back = np.array([[0,0,0,0]])
+                        temp = np.array([[arr[0][0],arr[0][1],arr[0][2],arr[0][3]]])
+                        prop = False
+                        for it in range(4):
+                            if temp[0][it] == max(temp[0]):
+                                back[0][it] = 1
+                        kt = random.randint(0,3)
+                        while (sum(back[0])) > 1:
+                            back[0][kt%4] = 0
+                            kt = kt + 1
+                        if back[0][ch] != 1:
+                            nn.backPropagate(back)
+                        '''print(score-0.1*moves,moves)
+                        print(nn.output,ch)
+                        print(back)
+                        print(arr[0][0],arr[0][1],arr[0][2],arr[0][3])
+                        print(dotX,dotY)'''
                     if (int(i/mult+int(self.bufX/steps)) < width and int(i/mult+int(self.bufX/steps)) > 0 and
                         board[int(j/mult+int(self.bufY/steps))][int(i/mult+int(self.bufX/steps))] != 1 and
                         self.pacX % mult == int(mult/2) and
@@ -258,11 +371,19 @@ class Pacman:
                             highScore = score
                         score = 0
                         wins = 0
+                        moves = 0
+                        if neural_network:
+                            arr2 = np.array([[1,1,1,1]])
+                            for it in range(4):
+                                if nn.output[0][it] == max(nn.output[0]):
+                                    arr2[0][it] = 0
+                            nn.backPropagate(arr2)
                         return
                     if not any(2 in x for x in board): #if all pellets are eaten, pacman wins and plays again with accumulating score & wins
                         if reset == False: #ensures update only increments once in case this block is reached more than once during reset
                             wins = wins + 1
                         reset = True
+                        moves = 0
                         return
                     if self.type == 5 and self.old == 3: #if pacman eats a super pellet, he becomes invincible and can eat ghosts
                         self.old = 0
@@ -483,6 +604,7 @@ def pacmanAgent(pac,g1,g2,g3,g4):
                 return 0
     ch = random.randint(0,len(ch2)-1) #pacman is adjacent to at least one pellet. randomly select pellet to move to if more than one
     return ch2[ch][2]
+
 def PacMan_Main():
 
     pygame.init()
