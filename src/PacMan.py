@@ -32,6 +32,7 @@ dotX = random.randint(0,width-1) #these are coordinates for a pellet for pacman 
 dotY = random.randint(0,height-1)
 reflex_agent = False #true to have ai play, false to play the game as a human
 neural_network = False #true to have nn play, false to play the game as a human or agent
+deaths = 0
 
 #below is the initial board state. each number corresponds to a particular entity
 #0: empty
@@ -116,8 +117,8 @@ def sigmoid_derivative(x):
 
 class NN:
     def __init__(self):
-        self.IHWeights = np.random.rand(20,20)
-        self.HOWeights = np.random.rand(20,4)
+        self.IHWeights = np.random.rand(18,18)
+        self.HOWeights = np.random.rand(18,4)
         self.output = np.zeros(4)
 
     def feedForward(self, x):
@@ -232,6 +233,7 @@ class Pacman:
         global moves
         global nn
         global neural_network
+        global deaths
         found = False
         for i in range(0,x,mult):
             for j in range(0,y,mult):
@@ -276,18 +278,19 @@ class Pacman:
                         moves = moves + 1
                         if board[dotY][dotX] != 2 and board[dotY][dotX] != 3:
                             findDot(p5x,p5y)
-                        arr = np.array([[board[p5y-1][p5x],board[p5y][p5x-1],board[p5y+1][p5x],board[p5y][p5x+1],p5x,p5y,p6x,p6y,p7x,p7y,p8x,p8y,p9x,p9y,dotX,dotY,score,score-0.1*moves,mode,mode==0 or modeCt>=900]])
+                        #arr = np.array([[board[p5y-1][p5x],board[p5y][p5x-1],board[p5y+1][p5x],board[p5y][p5x+1],p5x*0.1,p5y*0.1,p6x*0.1,p6y*0.1,p7x*0.1,p7y*0.1,p8x*0.1,p8y*0.1,p9x*0.1,p9y*0.1,dotX*0.1,dotY*0.1,score*0.01,score*0.01-0.001*moves,mode,mode==0 or modeCt>=900]])
+                        arr = np.array([[board[p5y-1][p5x],board[p5y][p5x-1],board[p5y+1][p5x],board[p5y][p5x+1],p5x*0.1,p5y*0.1,p6x*0.1,p6y*0.1,p7x*0.1,p7y*0.1,p8x*0.1,p8y*0.1,p9x*0.1,p9y*0.1,dotX*0.1,dotY*0.1,mode,mode==0 or modeCt>=900]])
                         for it in range(4):
                             if arr[0][it] == 1:
-                                arr[0][it] = -0.5/100
+                                arr[0][it] = -0.5
                             elif arr[0][it] > 5:
-                                arr[0][it] = -10/100
+                                arr[0][it] = -10
                                 if mode == 1 and modeCt < 900:
-                                    arr[0][it] = 10/100
+                                    arr[0][it] = 10
                             elif arr[0][it] == 2:
-                                arr[0][it] = 2/100
+                                arr[0][it] = 2
                             elif arr[0][it] == 3:
-                                arr[0][it] = 5/100
+                                arr[0][it] = 5
                             else:
                                 arr[0][it] = -0.2
                         nn.feedForward(arr)
@@ -366,6 +369,8 @@ class Pacman:
                     if (((self.old > 4 and self.type == 5) or
                         (self.old == 5 and self.type > 4))
                         and mode == 0): #if pacman and ghost run into each other while pacman is not invincible, game over
+                        deaths = deaths + 1
+                        #print(deaths,score,highScore)
                         reset = True
                         if score > highScore: #save new highscore
                             highScore = score
@@ -384,6 +389,7 @@ class Pacman:
                             wins = wins + 1
                         reset = True
                         moves = 0
+                        #print(wins,score,highScore)
                         return
                     if self.type == 5 and self.old == 3: #if pacman eats a super pellet, he becomes invincible and can eat ghosts
                         self.old = 0
