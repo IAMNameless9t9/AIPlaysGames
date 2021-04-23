@@ -3,6 +3,7 @@ import pygame
 import sys
 import random
 import numpy as np
+from datetime import datetime
 
 HAS_SNAKE_AI = False
 SCORE = 0
@@ -211,6 +212,11 @@ def Snake_Main():
     neuralNet = NN(12, 4)
 
     myfont = pygame.font.SysFont("monospace", 16)
+    
+    startTime = datetime.now()
+    currentTime = startTime.strftime("%H:%M:%S")
+    currentMin = currentTime[currentTime.index(":") + 1 : currentTime.rindex(":")]
+    currentIntMin = int(currentMin)
 
     while(True):
         
@@ -492,11 +498,26 @@ def Snake_Main():
             GENERATION += 1
             snake.reset()
 
-
         if snake.getHeadPosition() == food.position:
             snake.length += 1
             SCORE += 1
             food.randomizePosition()
+            
+        if HIGHSCORE >= 15:
+            endTime = datetime.now()
+            currentEndTime = endTime.strftime("%H:%M:%S")
+            currentMin = currentEndTime[currentEndTime.index(":") + 1 : currentEndTime.rindex(":")]
+            currentIntEndMin = int(currentMin)
+            
+            if (currentIntMin - currentIntEndMin) > 0:
+                print("==========\nTIME TAKEN TO GET 15: " + str(abs((currentIntMin - currentIntEndMin) - 60)) + "\nEPOCHS TAKEN: " + str(GENERATION) + "\nFINAL SCORE: " + str(HIGHSCORE) + "\n==========")
+            elif (currentIntMin - currentIntEndMin) < 0:
+                print("==========\nTIME TAKEN TO GET 15: " + str(abs(currentIntMin - currentIntEndMin)) + "\nEPOCHS TAKEN: " + str(GENERATION) + "\nFINAL SCORE: " + str(HIGHSCORE) + "\n==========")
+                
+            SCORE = 0
+            GENERATION = 0
+            HIGHSCORE = 0
+            Snake_Main()
             
         snake.draw(surface)
         food.draw(surface)
@@ -507,9 +528,6 @@ def Snake_Main():
         
         text = myfont.render("Iteration {0}".format(GENERATION), 1, (0, 0, 0))
         screen.blit(text, ((SCREEN_WIDTH/3), 25))
-
-        #temp = double(CURRENT_AVERAGE)
-        #print("Current Accuracy: " + str(temp))
 
         hstext = myfont.render("High Score {0}".format(HIGHSCORE), 1, (0, 0, 0))
         screen.blit(hstext, (SCREEN_WIDTH-165, 25))
