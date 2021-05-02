@@ -4,6 +4,7 @@ import pygame
 import time
 import random
 import numpy as np
+from datetime import datetime
 
 pygame.init()
 
@@ -628,6 +629,11 @@ def PacMan_Main():
     blinky = Pacman(7)
     pinky = Pacman(8)
     clyde = Pacman(9)
+    
+    startTime = datetime.now()
+    print("--------------")
+    currentTime = startTime.strftime("%H:%M:%S")
+    print(currentTime)
 
     global running
     while running: #main loop
@@ -690,18 +696,26 @@ def PacMan_Main():
                     clyde.color = (255,184,82)
             global score
             global wins
-            global highScore                    
+            global highScore     
+            global deaths
             old = score
             score = (wins * 241) + countScore()
             if score < old: #used to ensure score doesn't decrease when ghosts hover over pellets
                 score = old
-            outScore = "Score: " + str(score) + "     Highscore: " + str(highScore)
+            outScore = "Score: " + str(score) + "     Highscore: " + str(highScore) + "     Deaths: " + str(deaths)
             font = pygame.font.SysFont('aerial', mult)                                  
             text = font.render(outScore,True,(255,255,255))
             textRect = text.get_rect()
             textRect.center = (x/2,y+(mult/2))
             screen.blit(text,textRect)
         
+            if highScore >= 241:
+                endTime = datetime.now()
+                currentEndTime = endTime.strftime("%H:%M:%S")
+                print(currentEndTime + "\nDeaths: " + str(deaths) + "\nScore: " + str(highScore))
+                print("--------------")
+                running = False
+                
             global reset            
             if reset == True: #reset all game assets
                 score = 0
@@ -714,6 +728,7 @@ def PacMan_Main():
                 clyde = Pacman(9)
                 resetBoard()
                 updateBoard(screen)
+                
         if counter > 999999999: #prevent counter from going too high
             counter = 0
         pygame.display.flip()

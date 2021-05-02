@@ -11,6 +11,9 @@ HIGHSCORE = 0
 GENERATION = 0
 ALLOW_EXPORTING = False
 
+ENABLE_DATA_TOOLS = True
+GOAL_SCORE = 15
+
 DEATHS = 0
 CURRENT_AVERAGE = 0
 #================================
@@ -213,10 +216,10 @@ def Snake_Main():
 
     myfont = pygame.font.SysFont("monospace", 16)
     
-    startTime = datetime.now()
-    currentTime = startTime.strftime("%H:%M:%S")
-    currentMin = currentTime[currentTime.index(":") + 1 : currentTime.rindex(":")]
-    currentIntMin = int(currentMin)
+    if ENABLE_DATA_TOOLS:
+        startTime = datetime.now()
+        currentTime = startTime.strftime("%H:%M:%S")
+        print("==========\nStart Time: " + str(currentTime))
 
     while(True):
         
@@ -503,21 +506,20 @@ def Snake_Main():
             SCORE += 1
             food.randomizePosition()
             
-        if HIGHSCORE >= 15:
-            endTime = datetime.now()
-            currentEndTime = endTime.strftime("%H:%M:%S")
-            currentMin = currentEndTime[currentEndTime.index(":") + 1 : currentEndTime.rindex(":")]
-            currentIntEndMin = int(currentMin)
-            
-            if (currentIntMin - currentIntEndMin) > 0:
-                print("==========\nTIME TAKEN TO GET 15: " + str(abs((currentIntMin - currentIntEndMin) - 60)) + "\nEPOCHS TAKEN: " + str(GENERATION) + "\nFINAL SCORE: " + str(HIGHSCORE) + "\n==========")
-            elif (currentIntMin - currentIntEndMin) < 0:
-                print("==========\nTIME TAKEN TO GET 15: " + str(abs(currentIntMin - currentIntEndMin)) + "\nEPOCHS TAKEN: " + str(GENERATION) + "\nFINAL SCORE: " + str(HIGHSCORE) + "\n==========")
-                
-            SCORE = 0
-            GENERATION = 0
-            HIGHSCORE = 0
-            Snake_Main()
+        if ENABLE_DATA_TOOLS:
+            global GOAL_SCORE
+            if HIGHSCORE >= GOAL_SCORE:
+                endTime = datetime.now()
+                duration = (endTime - startTime)
+                currentEndTime = endTime.strftime("%H:%M:%S")
+                print("End Time: " + str(currentEndTime))
+                print("Time Taken: " + str(duration))
+                print("EPOCHS TAKEN: " + str(GENERATION) + "\nGOAL SCORE: " + str(GOAL_SCORE) + "\nFINAL SCORE: " + str(HIGHSCORE) + "\n==========")
+                    
+                SCORE = 0
+                GENERATION = 0
+                HIGHSCORE = 0
+                Snake_Main()
             
         snake.draw(surface)
         food.draw(surface)
