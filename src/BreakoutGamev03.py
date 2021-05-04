@@ -307,6 +307,10 @@ class NeuralNetwork:
 #=========================================================================#
 def Breakout_Main():
 
+    now = datetime.now()
+    currentTime = now.strftime("%H:%M:%S")
+    print("===============\nStart Time: " + str(currentTime))
+
     pygame.init()
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
@@ -345,7 +349,8 @@ def Breakout_Main():
     while GAME_RUNNING:
 
         if len(bricks) == 0:
-            GAME_RUNNING = False
+            ##GAME_RUNNING = False
+            pass
         
         screen.fill((0, 0, 0))
 
@@ -394,9 +399,23 @@ def Breakout_Main():
 
         if SCORE > HIGHSCORE:
             HIGHSCORE = SCORE
-            now = datetime.now()
-            currentTime = now.strftime("%H:%M:%S")
-            print(currentTime, "| New High Score:", HIGHSCORE, "in", DEATHS, "deaths.")
+            #now = datetime.now()
+            #currentTime = now.strftime("%H:%M:%S")
+            #print(currentTime, "| New High Score:", HIGHSCORE, "in", DEATHS, "deaths.")
+            
+        if HIGHSCORE >= 13000:
+            end = datetime.now()
+            currentEndTime = now.strftime("%H:%M:%S")
+            print("End Time: " + str(currentEndTime))
+            print("Duration: " + str((end - now)))
+            print("Deaths: " + str(DEATHS))
+            print("Goal Score: " + str(13000))
+            print("End Score: " + str(HIGHSCORE))
+            print("===============")
+            SCORE = 0
+            HIGHSCORE = 0
+            DEATHS = 0
+            Breakout_Main()
 
         text = myfont.render("Score: {0}".format(SCORE), 1, (255, 255, 255))
         screen.blit(text, (30, SCREEN_HEIGHT-30))

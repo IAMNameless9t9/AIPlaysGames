@@ -709,14 +709,20 @@ def PacMan_Main():
             textRect.center = (x/2,y+(mult/2))
             screen.blit(text,textRect)
         
-            if highScore >= 241:
+            global reset
+            if highScore >= 241 and reset == False:
                 endTime = datetime.now()
                 currentEndTime = endTime.strftime("%H:%M:%S")
-                print(currentEndTime + "\nDeaths: " + str(deaths) + "\nScore: " + str(highScore))
+                print(currentEndTime + "\nDeaths: " + str(deaths) + "\nGoal Score: " + str(241) + "\nFinal Score: " + str(highScore))
                 print("--------------")
-                running = False
-                
-            global reset            
+                reset = True
+                highScore = 0
+                deaths = 0
+                startTime = datetime.now()
+                print("--------------")
+                currentTime = startTime.strftime("%H:%M:%S")
+                print(currentTime)
+                          
             if reset == True: #reset all game assets
                 score = 0
                 mode = 0
