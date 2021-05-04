@@ -117,8 +117,8 @@ def sigmoid_derivative(x):
 
 class NN:
     def __init__(self):
-        self.IHWeights = np.random.rand(18,18)
-        self.HOWeights = np.random.rand(18,4)
+        self.IHWeights = np.random.rand(17,17)
+        self.HOWeights = np.random.rand(17,4)
         self.output = np.zeros(4)
 
     def feedForward(self, x):
@@ -279,18 +279,18 @@ class Pacman:
                         if board[dotY][dotX] != 2 and board[dotY][dotX] != 3:
                             findDot(p5x,p5y)
                         #arr = np.array([[board[p5y-1][p5x],board[p5y][p5x-1],board[p5y+1][p5x],board[p5y][p5x+1],p5x*0.1,p5y*0.1,p6x*0.1,p6y*0.1,p7x*0.1,p7y*0.1,p8x*0.1,p8y*0.1,p9x*0.1,p9y*0.1,dotX*0.1,dotY*0.1,score*0.01,score*0.01-0.001*moves,mode,mode==0 or modeCt>=900]])
-                        arr = np.array([[board[p5y-1][p5x],board[p5y][p5x-1],board[p5y+1][p5x],board[p5y][p5x+1],p5x*0.1,p5y*0.1,p6x*0.1,p6y*0.1,p7x*0.1,p7y*0.1,p8x*0.1,p8y*0.1,p9x*0.1,p9y*0.1,dotX*0.1,dotY*0.1,mode,mode==0 or modeCt>=900]])
+                        arr = np.array([[board[p5y-1][p5x],board[p5y][p5x-1],board[p5y+1][p5x],board[p5y][p5x+1],p5x*0.1,p5y*0.1,p6x*0.1,p6y*0.1,p7x*0.1,p7y*0.1,p8x*0.1,p8y*0.1,p9x*0.1,p9y*0.1,dotX*0.1,dotY*0.1,not(mode==0 or modeCt>=900)]])
                         for it in range(4):
                             if arr[0][it] == 1:
-                                arr[0][it] = -0.5
+                                arr[0][it] = -0.5*0.1
                             elif arr[0][it] > 5:
-                                arr[0][it] = -10
+                                arr[0][it] = -10*0.1
                                 if mode == 1 and modeCt < 900:
-                                    arr[0][it] = 10
+                                    arr[0][it] = 10*0.1
                             elif arr[0][it] == 2:
-                                arr[0][it] = 2
+                                arr[0][it] = 2*0.1
                             elif arr[0][it] == 3:
-                                arr[0][it] = 5
+                                arr[0][it] = 5*0.1
                             else:
                                 arr[0][it] = -0.2
                         nn.feedForward(arr)
