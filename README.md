@@ -1,11 +1,6 @@
 # AIPlaysGames
-Simple Genetic Algorithms &amp; Deep Learning Based AI Learns How To Play Snake, Breakout, and PacMan.
+Neural Network based AI Learn How To Play Snake, Breakout, and PacMan.
 
 Team: Nathanael L. Mann, Austin Brown, Cooper Martin
 
-For our project, each member will be recreating a classic game using the PyGame library. 
-Nathanael will be responsible for Breakout.
-Austin will be responsible for Snake.
-Cooper will be responsible for Pac-Man. 
-
-The goal of the project will be to teach an AI to play each of these games using a combination of Genetic Algorithms and Deep-Q-Learning in order to have the AIs improve over time. Given extra time, we would like to train the AI to play more games, but three seems like a sufficient starting goal.
+Our team re-created three classic arcade-style games in Python using the Pygame Library; Breakout, Snake, and Pac-Man. We then implemented a neural network to learn each of these games using NumPy and allowed it to learn over time through trial and error. We used a combination of shallow neural networks and deep neural networks and found that the simpler variety was sufficient for Breakout, but that even with the added complexity the deep neural network was not able to achieve a perfect score in either Snake or Pacman.
